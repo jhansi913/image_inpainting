@@ -13,7 +13,7 @@ import test_dataset
 # -----------------------------
 # Configuration
 # -----------------------------
-MODEL_URL = "https://github.com/<your-username>/<your-repo>/releases/download/v1.0/deepfillv2.pth"
+MODEL_URL = "https://github.com/jhansi913/image_inpainting/releases/download/v1.0/deepfillv2.pth"
 MODEL_PATH = "models/deepfillv2.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
