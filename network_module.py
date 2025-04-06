@@ -4,6 +4,7 @@ from torch.nn import functional as F
 from torch.nn import Parameter
 import utils
 
+from utils_patches import extract_image_patches  # ✅ safe import
 
 
 #-----------------------------------------------
