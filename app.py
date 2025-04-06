@@ -6,7 +6,7 @@ import cv2
 from PIL import Image
 import os
 from utils import create_generator
-from test_dataset import normalize, tensor_to_image
+from test_dataset import tensor_to_image
 import yaml
 import types
 
