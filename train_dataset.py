@@ -10,7 +10,8 @@ from PIL import Image, ImageDraw
 from torchvision import transforms
 from torch.utils.data import Dataset
 
-import utils
+import util1
+
 
 ALLMASKTYPES = ['single_bbox', 'bbox', 'free_form']
 
