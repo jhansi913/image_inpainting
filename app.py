@@ -32,6 +32,10 @@ def load_model():
     model.load_state_dict(torch.load('deepfillv2.pth', map_location='cpu'))
     model.eval()
     return model
+def normalize(img_tensor):
+    return (img_tensor - 0.5) / 0.5
+
+ 
 
 def preprocess_image(image, mask, size=256):
     # Resize to input size and convert to tensor
