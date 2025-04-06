@@ -291,7 +291,7 @@ class ContextualAttention(nn.Module):
         # extract patches from background with stride and rate
         kernel = 2 * self.rate
         # raw_w is extracted for reconstruction
-        raw_w = extract_image_patches(b, ksizes=[kernel, kernel],
+        raw_w =  util1.extract_image_patches(b, ksizes=[kernel, kernel],
                                       strides=[self.rate*self.stride,
                                                self.rate*self.stride],
                                       rates=[1, 1],
@@ -309,7 +309,7 @@ class ContextualAttention(nn.Module):
         int_bs = list(b.size())
         f_groups = torch.split(f, 1, dim=0)  # split tensors along the batch dimension
         # w shape: [N, C*k*k, L]
-        w = extract_image_patches(b, ksizes=[self.ksize, self.ksize],
+        w = util1.extract_image_patches(b, ksizes=[self.ksize, self.ksize],
                                   strides=[self.stride, self.stride],
                                   rates=[1, 1],
                                   padding='same')
@@ -322,7 +322,7 @@ class ContextualAttention(nn.Module):
         mask = F.interpolate(mask, scale_factor=1./self.rate, mode='nearest')
         int_ms = list(mask.size())
         # m shape: [N, C*k*k, L]
-        m = extract_image_patches(mask, ksizes=[self.ksize, self.ksize],
+        m = util1.extract_image_patches(mask, ksizes=[self.ksize, self.ksize],
                                   strides=[self.stride, self.stride],
                                   rates=[1, 1],
                                   padding='same')
