@@ -1,84 +1,100 @@
 import streamlit as st
 import torch
 from torchvision import transforms
-import numpy as np
-import cv2
 from PIL import Image
+import numpy as np
+import utils
+import network
+import test_dataset
 import os
-from utils import create_generator
-from test_dataset import tensor_to_image
-import yaml
-import types
 
-# Load options
-class Options:
+# ----------------------------------------
+#              Configurations
+# ----------------------------------------
+
+class Args:
     def __init__(self):
-        self.init_type = 'kaiming'
+        self.in_channels = 4
+        self.out_channels = 3
+        self.latent_channels = 48
+        self.pad_type = 'zero'
+        self.activation = 'elu'
+        self.norm = 'none'
+        self.init_type = 'xavier'
         self.init_gain = 0.02
-        self.input_size = 256
-        self.gpu_ids = []
-        self.padding = 'SAME'
-        self.rate = 2
-        self.threshold = 0.7
-        self.iteration = 1
-        self.upsample = True
 
-opt = Options()
+opt = Args()
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Load pretrained model
+# ----------------------------------------
+#        Load Generator Model
+# ----------------------------------------
+
 @st.cache_resource
 def load_model():
-    model = create_generator(opt)
-    model.load_state_dict(torch.load('deepfillv2.pth', map_location='cpu'))
-    model.eval()
-    return model
-def normalize(img_tensor):
-    return (img_tensor - 0.5) / 0.5
+    generator = utils.create_generator(opt)
+    model_path = 'deepfillv2.pth'  # Put this file manually or download from GitHub Release
+    generator.load_state_dict(torch.load(model_path, map_location=DEVICE))
+    generator.to(DEVICE).eval()
+    return generator
 
- 
+# ----------------------------------------
+#         Preprocessing Functions
+# ----------------------------------------
 
-def preprocess_image(image, mask, size=256):
-    # Resize to input size and convert to tensor
-    image = image.resize((size, size)).convert("RGB")
-    mask = mask.resize((size, size)).convert("L")
+def preprocess(image_pil, mask_pil):
+    transform = transforms.Compose([
+        transforms.Resize((256, 256)),
+        transforms.ToTensor()
+    ])
+    image = transform(image_pil.convert("RGB")).unsqueeze(0)  # [1, 3, H, W]
+    mask = transform(mask_pil.convert("L")).unsqueeze(0)      # [1, 1, H, W]
+    return image.to(DEVICE), mask.to(DEVICE)
 
-    img_tensor = transforms.ToTensor()(image).unsqueeze(0)
-    mask_tensor = transforms.ToTensor()(mask).unsqueeze(0)
-    ones_tensor = torch.ones_like(mask_tensor)
+def postprocess(tensor):
+    tensor = tensor.squeeze().cpu().detach().permute(1, 2, 0).numpy()
+    tensor = (tensor * 255).astype(np.uint8)
+    return Image.fromarray(tensor)
 
-    return normalize(img_tensor), mask_tensor, ones_tensor
+# ----------------------------------------
+#              Streamlit UI
+# ----------------------------------------
 
-def inpaint(model, image, mask, ones):
-    with torch.no_grad():
-        first_out, second_out, offset_flow = model(image, mask, ones)
-        return second_out
-
-# Streamlit UI
+st.set_page_config(page_title="DeepFillv2 Inpainting", layout="centered")
 st.title("🖼️ DeepFillv2 Image Inpainting")
+st.markdown("Upload an image and a mask to remove unwanted regions.")
 
-uploaded_image = st.file_uploader("Upload Image", type=['jpg', 'png', 'jpeg'])
-uploaded_mask = st.file_uploader("Upload Mask", type=['jpg', 'png', 'jpeg'])
+uploaded_image = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
+uploaded_mask = st.file_uploader("Upload Mask (white = masked)", type=["jpg", "jpeg", "png"])
 
 if uploaded_image and uploaded_mask:
     image = Image.open(uploaded_image)
     mask = Image.open(uploaded_mask)
 
-    st.image([image, mask], caption=["Original Image", "Mask"], width=256)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(image, caption="Original Image", use_column_width=True)
+    with col2:
+        st.image(mask, caption="Mask", use_column_width=True)
 
-    model = load_model()
-    norm_img, mask_tensor, ones_tensor = preprocess_image(image, mask)
+    if st.button("Run Inpainting 🎨"):
+        with st.spinner("Running DeepFillv2..."):
+            generator = load_model()
+            img_tensor, mask_tensor = preprocess(image, mask)
 
-    output = inpaint(model, norm_img, mask_tensor, ones_tensor)
-    result_image = tensor_to_image(output)
+            with torch.no_grad():
+                first_out, second_out = generator(img_tensor, mask_tensor)
+                result_tensor = img_tensor * (1 - mask_tensor) + second_out * mask_tensor
+                result_image = postprocess(result_tensor)
 
-    st.subheader("🧠 Inpainted Result")
-    st.image(result_image, caption="Output", width=256)
+        st.markdown("### ✨ Inpainting Output")
+        st.image(result_image, use_column_width=True)
 
-    # Convert to downloadable file
-    result_pil = Image.fromarray(result_image)
-    st.download_button(
-        label="Download Result",
-        data=cv2.imencode('.png', cv2.cvtColor(result_image, cv2.COLOR_RGB2BGR))[1].tobytes(),
-        file_name="inpainting_result.png",
-        mime="image/png"
-    )
+        # Download button
+        buf = result_image.convert("RGB")
+        st.download_button(
+            label="📥 Download Inpainted Image",
+            data=buf.tobytes(),
+            file_name="inpainted_output.png",
+            mime="image/png"
+        )
