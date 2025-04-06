@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 from torch.nn import Parameter
-import util1
+from util1 import extract_image_patches
 
   # ✅ safe import
 
