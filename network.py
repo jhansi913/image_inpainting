@@ -4,7 +4,7 @@ import torch.nn.init as init
 import torchvision
 
 from network_module import *
-from utils import extract_image_patches
+import utils
 
 
 def weights_init(net, init_type = 'kaiming', init_gain = 0.02):
