@@ -3,6 +3,8 @@ from torch import nn
 from torch.nn import functional as F
 from torch.nn import Parameter
 from utils import *
+from utils import extract_image_patches
+
 
 
 #-----------------------------------------------
