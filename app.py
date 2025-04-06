@@ -7,22 +7,14 @@ import utils
 import network
 import test_dataset
 import os
+import urllib.request  # ✅ Required for downloading model
 
 # ----------------------------------------
 #              Configurations
 # ----------------------------------------
 MODEL_URL = "https://github.com/jhansi913/image_inpainting/releases/download/v1.0/deepfillv2_WGAN.pth"
-
 MODEL_NAME = "deepfillv2_WGAN.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-def download_model():
-    if not os.path.exists(MODEL_NAME):
-        print("🔄 Downloading model from GitHub...")
-        urllib.request.urlretrieve(MODEL_URL, MODEL_NAME)
-        print("✅ Model downloaded.")
-    else:
-        print("📦 Model already exists locally.")
 
 class Args:
     def __init__(self):
@@ -36,17 +28,24 @@ class Args:
         self.init_gain = 0.02
 
 opt = Args()
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ----------------------------------------
 #        Load Generator Model
 # ----------------------------------------
 
+def download_model():
+    if not os.path.exists(MODEL_NAME):
+        print("🔄 Downloading model from GitHub...")
+        urllib.request.urlretrieve(MODEL_URL, MODEL_NAME)
+        print("✅ Model downloaded.")
+    else:
+        print("📦 Model already exists locally.")
+
 @st.cache_resource
 def load_model():
+    download_model()  # ✅ Ensure the model gets downloaded
     generator = utils.create_generator(opt)
-    model_path = 'deepfillv2_WGAN.pth'  # Put this file manually or download from GitHub Release
-    generator.load_state_dict(torch.load(model_path, map_location=DEVICE))
+    generator.load_state_dict(torch.load(MODEL_NAME, map_location=DEVICE))
     generator.to(DEVICE).eval()
     return generator
 
@@ -103,10 +102,9 @@ if uploaded_image and uploaded_mask:
         st.image(result_image, use_column_width=True)
 
         # Download button
-        buf = result_image.convert("RGB")
         st.download_button(
             label="📥 Download Inpainted Image",
-            data=buf.tobytes(),
+            data=result_image.convert("RGB").tobytes(),
             file_name="inpainted_output.png",
             mime="image/png"
         )
