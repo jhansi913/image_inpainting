@@ -11,6 +11,18 @@ import os
 # ----------------------------------------
 #              Configurations
 # ----------------------------------------
+MODEL_URL = "https://github.com/jhansi913/image_inpainting/releases/download/v1.0/deepfillv2_gan.pth"
+
+MODEL_NAME = "deepfillv2_gan.pth"
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def download_model():
+    if not os.path.exists(MODEL_NAME):
+        print("🔄 Downloading model from GitHub...")
+        urllib.request.urlretrieve(MODEL_URL, MODEL_NAME)
+        print("✅ Model downloaded.")
+    else:
+        print("📦 Model already exists locally.")
 
 class Args:
     def __init__(self):
