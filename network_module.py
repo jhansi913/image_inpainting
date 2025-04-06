@@ -271,13 +271,16 @@ class ContextualAttention(nn.Module):
         else:
             raise NotImplementedError('Unsupported padding type: {}.\
                 Only "same" or "valid" are supported.'.format(padding))
-         unfold = torch.nn.Unfold(kernel_size=ksizes,
+        unfold = torch.nn.Unfold(kernel_size=ksizes,
                              dilation=rates,
                              padding=0,
                              stride=strides)
-          
         patches = unfold(images)
         return patches
+          
+          
+         
+         
     
 
 
