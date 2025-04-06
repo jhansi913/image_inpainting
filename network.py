@@ -5,7 +5,7 @@ import torchvision
 
 from network_module import *
 import utils
-from utils_patches import extract_image_patches  # ✅ safe import
+  # ✅ safe import
 
 
 def weights_init(net, init_type = 'kaiming', init_gain = 0.02):
