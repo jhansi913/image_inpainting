@@ -9,7 +9,8 @@ from PIL import Image, ImageDraw
 from torchvision import transforms
 from torch.utils.data import Dataset
 
-import utils
+import util1
+
 
 class InpaintDataset(Dataset):
     def __init__(self, opt):
