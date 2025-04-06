@@ -11,9 +11,9 @@ import os
 # ----------------------------------------
 #              Configurations
 # ----------------------------------------
-MODEL_URL = "https://github.com/jhansi913/image_inpainting/releases/download/v1.0/deepfillv2_gan.pth"
+MODEL_URL = "https://github.com/jhansi913/image_inpainting/releases/download/v1.0/deepfillv2_WGAN.pth"
 
-MODEL_NAME = "deepfillv2_gan.pth"
+MODEL_NAME = "deepfillv2_WGAN.pth"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def download_model():
@@ -45,7 +45,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 @st.cache_resource
 def load_model():
     generator = utils.create_generator(opt)
-    model_path = 'deepfillv2.pth'  # Put this file manually or download from GitHub Release
+    model_path = 'deepfillv2_WGAN.pth'  # Put this file manually or download from GitHub Release
     generator.load_state_dict(torch.load(model_path, map_location=DEVICE))
     generator.to(DEVICE).eval()
     return generator
