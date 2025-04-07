@@ -4,7 +4,6 @@ import torch.nn.init as init
 import torchvision
 
 from network_module import *
-import util1
 
 
   # ✅ safe import
