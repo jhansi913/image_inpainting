@@ -101,7 +101,9 @@ if uploaded_image and uploaded_mask:
                 result_image = postprocess(result_tensor)
 
         st.markdown("### ✨ Inpainting Output")
-        st.image(result_image, use_column_width=True)
+        
+
+        st.image(result_image, use_container_width=True)
 
         # Download button
         st.download_button(
