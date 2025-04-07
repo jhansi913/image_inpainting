@@ -88,7 +88,7 @@ if uploaded_image and uploaded_mask:
         st.image(image, use_container_width=True)
 
     with col2:
-        st.image(image, use_container_width=True)
+        st.image(mask, use_container_width=True)
 
     if st.button("Run Inpainting 🎨"):
         with st.spinner("Running DeepFillv2..."):
