@@ -45,7 +45,7 @@ def download_model():
 @st.cache_resource
 def load_model():
     download_model()  # ✅ Ensure the model gets downloaded
-    generator = utils.create_generator(opt)
+    generator = util1.create_generator(opt)
     generator.load_state_dict(torch.load(MODEL_NAME, map_location=DEVICE))
     generator.to(DEVICE).eval()
     return generator
