@@ -205,24 +205,4 @@ class InpaintDataset(Dataset):
         mask = torch.cat([rect_mask, brush_mask], dim=1).max(dim=1, keepdim=True)[0]
         return mask
         
-class ValidationSet_with_Known_Mask(Dataset):
-    def __init__(self, opt):
-        self.opt = opt
-        self.namelist = utils.get_names(opt.baseroot)
-
-    def __len__(self):
-        return len(self.namelist)
-
-    def __getitem__(self, index):
-        # image
-        imgname = self.namelist[index]
-        imgpath = os.path.join(self.opt.baseroot, imgname)
-        img = cv2.imread(imgpath)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        # mask
-        maskpath = os.path.join(self.opt.maskroot, imgname)
-        img = cv2.imread(maskpath, cv2.IMREAD_GRAYSCALE)
-        # the outputs are entire image and mask, respectively
-        img = torch.from_numpy(img.astype(np.float32) / 255.0).permute(2, 0, 1).contiguous()
-        mask = torch.from_numpy(mask.astype(np.float32)).unsqueeze(0).contiguous()
-        return img, mask, imgname
+ 
