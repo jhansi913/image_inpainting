@@ -42,7 +42,7 @@ if __name__ == "__main__":
     parser.add_argument('--init_type', type = str, default = 'xavier', help = 'the initialization type')
     parser.add_argument('--init_gain', type = float, default = 0.02, help = 'the initialization gain')
     # Dataset parameters
-    parser.add_argument('--baseroot', type = str, default = "C:\\Users\\yzzha\\Desktop\\dataset\\ILSVRC2012_val_256", help = 'the training folder')
+    parser.add_argument('--baseroot', type = str, default = "C:\\Users\\kaggle\\Desktop\\dataset\\ILSVRC2012_val_256", help = 'the training folder')
     parser.add_argument('--mask_type', type = str, default = 'free_form', help = 'mask type')
     parser.add_argument('--imgsize', type = int, default = 256, help = 'size of image')
     parser.add_argument('--margin', type = int, default = 10, help = 'margin of image')
