@@ -168,7 +168,7 @@ class PerceptualNet(nn.Module):
         for p in block[0]:
             p.requires_grad = False
         self.block = torch.nn.ModuleList(block)
-        self.transform = torch.nn.functional.interpolate
+        self.transform = torch.nn.functional.interpolate #is used to resize tensors, typically images or feature maps.
         self.register_buffer('mean', torch.FloatTensor([0.485, 0.456, 0.406]).view(1,3,1,1))
         self.register_buffer('std', torch.FloatTensor([0.229, 0.224, 0.225]).view(1,3,1,1))
 
